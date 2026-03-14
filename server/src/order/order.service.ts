@@ -1,0 +1,143 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class OrderService {
+  constructor(private prisma: PrismaService) {}
+
+  async create(userId: number, createOrderDto: CreateOrderDto) {
+    let total = 0;
+    const orderItemsData: { productId: number; quantity: number; price: number }[] = [];
+
+
+    // Check stock and calculate total
+    for (const item of createOrderDto.items) {
+      const product = await this.prisma.product.findUnique({ where: { id: item.productId } });
+      if (!product) {
+        throw new NotFoundException(`Product ID ${item.productId} not found`);
+      }
+      if (product.stock < item.quantity) {
+        throw new BadRequestException(`Insufficient stock for product ${product.name}`);
+      }
+      
+      const itemTotal = product.price * item.quantity;
+      total += itemTotal;
+      
+      orderItemsData.push({
+        productId: product.id,
+        quantity: item.quantity,
+        price: product.price, // capture price at purchase time
+      });
+    }
+
+    // Create order and decrement stock inside a transaction
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({
+        data: {
+          userId,
+          total,
+          status: 'pending',
+          items: {
+            create: orderItemsData,
+          },
+        },
+        include: { items: true },
+      });
+
+      // Update stock
+      for (const item of orderItemsData) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { decrement: item.quantity } },
+        });
+      }
+
+      return order;
+    });
+  }
+
+  async findAll(userId: number, role: string, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    if (role === 'admin') {
+      const [data, total] = await Promise.all([
+        this.prisma.order.findMany({
+          include: {
+            user: {
+              select: { username: true, email: true }
+            },
+            items: {
+              include: { product: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+        }),
+        this.prisma.order.count(),
+      ]);
+      return {
+        data,
+        meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      };
+    }
+
+    const where = { userId };
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        include: {
+          items: {
+            include: { product: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  async findOne(id: number, userId: number, role: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: { username: true, email: true }
+        },
+        items: {
+          include: { product: true }
+        }
+      },
+    });
+    
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    
+    if (role !== 'admin' && order.userId !== userId) {
+      throw new NotFoundException('Order not found'); // Hide existence to unauthorized user
+    }
+    
+    return order;
+  }
+
+  async updateStatus(id: number, updateOrderDto: UpdateOrderDto) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    
+    return this.prisma.order.update({
+      where: { id },
+      data: { status: updateOrderDto.status },
+    });
+  }
+}

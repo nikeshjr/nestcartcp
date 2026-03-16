@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, PackageSearch, History, Menu, X, User, LogOut, ShieldCheck, Heart } from 'lucide-react';
+import { ShoppingCart, PackageSearch, History, Menu, X, User, LogOut, ShieldCheck, Heart, Search, Tag } from 'lucide-react';
+import api from '../services/api';
 import './Navbar.css';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +13,11 @@ const Navbar = () => {
   const { itemCount } = useCart();
   const { user, logout, isAdmin } = useAuth();
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [suggestions, setSuggestions] = React.useState({ products: [], categories: [] });
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const suggestionRef = React.useRef(null);
+  const searchTimeout = React.useRef(null);
 
   // Synchronize searchTerm with URL search param
   React.useEffect(() => {
@@ -19,6 +25,62 @@ const Navbar = () => {
     const search = params.get('search') || '';
     setSearchTerm(search);
   }, [location.search]);
+
+  // Click away listener for suggestions
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const fetchSuggestions = async (query) => {
+    if (query.length < 2) {
+      setSuggestions({ products: [], categories: [] });
+      setShowSuggestions(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.get(`/products/suggestions?q=${encodeURIComponent(query)}`);
+      setSuggestions(response.data);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    
+    if (value.trim()) {
+      searchTimeout.current = setTimeout(() => {
+        fetchSuggestions(value.trim());
+      }, 300);
+    } else {
+      setSuggestions({ products: [], categories: [] });
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (type, item) => {
+    setShowSuggestions(false);
+    if (type === 'product') {
+      navigate(`/products/${item.id}`);
+    } else {
+      navigate(`/?categoryId=${item.id}&categoryName=${encodeURIComponent(item.name)}`);
+    }
+    setSearchTerm('');
+  };
 
   const handleLogout = () => {
     logout();
@@ -31,21 +93,11 @@ const Navbar = () => {
     return location.pathname === path ? 'active' : '';
   };
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    
-    if (value.trim()) {
-      navigate(`/?search=${encodeURIComponent(value.trim())}`);
-    } else {
-      navigate('/');
-    }
-  };
-
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/?search=${encodeURIComponent(searchTerm.trim())}`);
+      setShowSuggestions(false);
       setIsOpen(false);
     } else {
       navigate('/');
@@ -62,17 +114,68 @@ const Navbar = () => {
           </Link>
 
           {/* Search Bar */}
-          <form className="navbar-search desktop-menu" onSubmit={handleSearch}>
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={handleInputChange}
-            />
-            <button type="submit">
-              <PackageSearch size={18} />
-            </button>
-          </form>
+          <div className="navbar-search-wrapper" ref={suggestionRef}>
+            <form className="navbar-search desktop-menu" onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={handleInputChange}
+                onFocus={() => searchTerm.length >= 2 && setShowSuggestions(true)}
+              />
+              <button type="submit">
+                <Search size={18} />
+              </button>
+            </form>
+
+            {/* Suggestions Dropdown */}
+            {showSuggestions && (suggestions.products.length > 0 || suggestions.categories.length > 0) && (
+              <div className="search-suggestions card animate-fade-in">
+                {suggestions.categories.length > 0 && (
+                  <div className="suggestion-group">
+                    <div className="suggestion-label">Categories</div>
+                    {suggestions.categories.map(cat => (
+                      <div 
+                        key={`cat-${cat.id}`} 
+                        className="suggestion-item"
+                        onClick={() => handleSuggestionClick('category', cat)}
+                      >
+                        <Tag size={14} />
+                        <span>{cat.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {suggestions.products.length > 0 && (
+                  <div className="suggestion-group">
+                    <div className="suggestion-label">Products</div>
+                    {suggestions.products.map(prod => (
+                      <div 
+                        key={`prod-${prod.id}`} 
+                        className="suggestion-item product-suggestion"
+                        onClick={() => handleSuggestionClick('product', prod)}
+                      >
+                        <div className="suggestion-img">
+                          {prod.image ? (
+                            <img src={prod.image} alt="" />
+                          ) : (
+                            <PackageSearch size={16} />
+                          )}
+                        </div>
+                        <div className="suggestion-info">
+                          <div className="suggestion-name">{prod.name}</div>
+                          <div className="suggestion-price">${prod.price.toFixed(2)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {loading && <div className="suggestion-loading">Searching...</div>}
+              </div>
+            )}
+          </div>
 
           {/* Desktop Menu */}
           <div className="navbar-menu desktop-menu">

@@ -15,6 +15,12 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Public()
+  @Get('suggestions')
+  getSuggestions(@Query('q') query: string) {
+    return this.productService.getSuggestions(query);
+  }
+
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')

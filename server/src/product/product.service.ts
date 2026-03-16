@@ -92,4 +92,28 @@ export class ProductService {
       });
     });
   }
+
+  async getSuggestions(query: string) {
+    if (!query || query.trim().length < 2) return { products: [], categories: [] };
+
+    const [products, categories] = await Promise.all([
+      this.prisma.product.findMany({
+        where: {
+          OR: [
+            { name: { contains: query } },
+            { description: { contains: query } },
+          ],
+        },
+        select: { id: true, name: true, price: true, image: true },
+        take: 5,
+      }),
+      this.prisma.category.findMany({
+        where: { name: { contains: query } },
+        select: { id: true, name: true },
+        take: 3,
+      }),
+    ]);
+
+    return { products, categories };
+  }
 }

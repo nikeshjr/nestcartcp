@@ -3,105 +3,105 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgres"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  password  String
-  role      String   @default("user")
-  createdAt DateTime @default(now())
-  orders    Order[]
-  cartItems CartItem[]
-  wishlist  WishlistItem[]
-  reviews   Review[]
+  id           Int            @id @default(autoincrement())
+  username     String         @unique(map: "User_username_key")
+  email        String         @unique(map: "User_email_key")
+  password     String
+  role         String         @default("user")
+  createdAt    DateTime       @default(now())
+  cartItems    CartItem[]
+  orders       Order[]
+  reviews      Review[]
+  wishlist     WishlistItem[]
 }
 
-// Products
 model Product {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  stock       Int
-  categoryId  Int?
-  image       String?     @db.Text
-  createdAt   DateTime    @default(now())
-  
-  category    Category?   @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
-  cartItems   CartItem[]
+  id            Int            @id @default(autoincrement())
+  name          String
+  description   String?
+  price         Float
+  stock         Int
+  createdAt     DateTime       @default(now())
+  categoryId    Int?
+  image         String?        @db.Text
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  category      Category?      @relation(fields: [categoryId], references: [id], map: "Product_categoryId_fkey")
+  reviews       Review[]
   wishlistItems WishlistItem[]
-  reviews     Review[]
+
+  @@index([categoryId], map: "Product_categoryId_fkey")
 }
 
 model Review {
   id        Int      @id @default(autoincrement())
-  rating    Int      // 1-5
+  rating    Int
   comment   String   @db.Text
   userId    Int
   productId Int
   createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], map: "Review_productId_fkey")
+  user      User     @relation(fields: [userId], references: [id], map: "Review_userId_fkey")
 
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+  @@index([productId], map: "Review_productId_fkey")
+  @@index([userId], map: "Review_userId_fkey")
 }
 
 model Category {
   id       Int       @id @default(autoincrement())
-  name     String    @unique
+  name     String    @unique(map: "Category_name_key")
   products Product[]
 }
 
-// Orders
 model Order {
   id        Int         @id @default(autoincrement())
   userId    Int
   total     Float
-  status    String      @default("pending") // pending, processing, shipped, delivered, cancelled
+  status    String      @default("pending")
   createdAt DateTime    @default(now())
-
-  user      User        @relation(fields: [userId], references: [id])
+  user      User        @relation(fields: [userId], references: [id], map: "Order_userId_fkey")
   items     OrderItem[]
+
+  @@index([userId], map: "Order_userId_fkey")
 }
 
-// Order Items (products inside an order)
 model OrderItem {
   id        Int     @id @default(autoincrement())
   orderId   Int
   productId Int
   quantity  Int
   price     Float
+  order     Order   @relation(fields: [orderId], references: [id], map: "OrderItem_orderId_fkey")
+  product   Product @relation(fields: [productId], references: [id], map: "OrderItem_productId_fkey")
 
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  @@index([orderId], map: "OrderItem_orderId_fkey")
+  @@index([productId], map: "OrderItem_productId_fkey")
 }
 
-// Cart Items
 model CartItem {
   id        Int     @id @default(autoincrement())
   userId    Int
   productId Int
   quantity  Int
+  product   Product @relation(fields: [productId], references: [id], map: "CartItem_productId_fkey")
+  user      User    @relation(fields: [userId], references: [id], map: "CartItem_userId_fkey")
 
-  user      User    @relation(fields: [userId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
-
-  @@unique([userId, productId])
+  @@unique([userId, productId], map: "CartItem_userId_productId_key")
+  @@index([productId], map: "CartItem_productId_fkey")
 }
 
-// Wishlist Items
 model WishlistItem {
   id        Int     @id @default(autoincrement())
   userId    Int
   productId Int
+  product   Product @relation(fields: [productId], references: [id], map: "WishlistItem_productId_fkey")
+  user      User    @relation(fields: [userId], references: [id], map: "WishlistItem_userId_fkey")
 
-  user      User    @relation(fields: [userId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
-
-  @@unique([userId, productId])
+  @@unique([userId, productId], map: "WishlistItem_userId_productId_key")
+  @@index([productId], map: "WishlistItem_productId_fkey")
 }

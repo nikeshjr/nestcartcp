@@ -13,6 +13,7 @@ const Login = React.lazy(() => import('./pages/Login'));
 const Register = React.lazy(() => import('./pages/Register'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const Wishlist = React.lazy(() => import('./pages/Wishlist'));
+const ProductDetail = React.lazy(() => import('./pages/ProductDetail'));
 
 const PageLoader = () => (
   <div className="flex-center" style={{ minHeight: '60vh' }}>
@@ -38,6 +39,7 @@ function App() {
                   <Route path="/register" element={<Register />} />
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/products/:id" element={<ProductDetail />} />
                   {/* Fallback for undefined routes */}
                   <Route path="*" element={
                     <div className="container flex-center flex-column" style={{ minHeight: '50vh' }}>

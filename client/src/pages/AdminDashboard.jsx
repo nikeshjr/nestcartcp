@@ -32,7 +32,7 @@ const AdminDashboard = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   // Form States
-  const [productForm, setProductForm] = useState({ name: '', description: '', price: '', stock: '', categoryId: '' });
+  const [productForm, setProductForm] = useState({ name: '', description: '', price: '', stock: '', categoryId: '', image: '' });
   const [newCategoryName, setNewCategoryName] = useState('');
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
@@ -109,11 +109,12 @@ const AdminDashboard = () => {
         description: product.description,
         price: product.price,
         stock: product.stock,
-        categoryId: product.categoryId || ''
+        categoryId: product.categoryId || '',
+        image: product.image || ''
       });
     } else {
       setEditingProduct(null);
-      setProductForm({ name: '', description: '', price: '', stock: '', categoryId: '' });
+      setProductForm({ name: '', description: '', price: '', stock: '', categoryId: '', image: '' });
     }
     setShowProductModal(true);
   };
@@ -126,7 +127,8 @@ const AdminDashboard = () => {
         description: productForm.description,
         price: parseFloat(productForm.price),
         stock: parseInt(productForm.stock),
-        categoryId: productForm.categoryId ? parseInt(productForm.categoryId) : null
+        categoryId: productForm.categoryId ? parseInt(productForm.categoryId) : null,
+        image: productForm.image || null
       };
 
       if (editingProduct) {
@@ -329,9 +331,18 @@ const AdminDashboard = () => {
                   ) : products.map(product => (
                     <tr key={product.id}>
                       <td>
-                        <div className="table-product-info">
-                          <strong>{product.name}</strong>
-                          <span className="text-muted text-sm">ID: {product.id}</span>
+                        <div className="table-product-info" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', backgroundColor: 'var(--bg-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {product.image ? (
+                              <img src={product.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              <Package size={20} color="var(--text-muted)" />
+                            )}
+                          </div>
+                          <div>
+                            <strong>{product.name}</strong>
+                            <div className="text-muted text-sm">ID: {product.id}</div>
+                          </div>
                         </div>
                       </td>
                       <td>
@@ -586,6 +597,17 @@ const AdminDashboard = () => {
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
+              </div>
+              <div className="form-group mb-4">
+                <label htmlFor="p-image">Image URL</label>
+                <input
+                  id="p-image"
+                  type="text"
+                  className="form-input"
+                  placeholder="https://example.com/product-image.jpg"
+                  value={productForm.image}
+                  onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                />
               </div>
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <div className="form-group mb-6" style={{ flex: 1 }}>

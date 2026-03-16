@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
@@ -33,40 +34,55 @@ const getProgress = (orderStatus) => {
 
 const Orders = () => {
   const { user } = useAuth();
+  const { showToast } = useNotification();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
 
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/orders', { params: { page, limit: 10 } });
+      const orderData = response.data;
+      
+      if (orderData && orderData.meta) {
+        setOrders(orderData.data || []);
+        setTotalPages(orderData.meta.totalPages || 1);
+        setTotalOrders(orderData.meta.total || 0);
+      } else {
+        setOrders(Array.isArray(orderData) ? orderData : []);
+        setTotalPages(1);
+        setTotalOrders(Array.isArray(orderData) ? orderData.length : 0);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (user) {
-      const fetchOrders = async () => {
-        setLoading(true);
-        try {
-          const response = await api.get('/orders', { params: { page, limit: 10 } });
-          const orderData = response.data;
-          
-          if (orderData && orderData.meta) {
-            setOrders(orderData.data || []);
-            setTotalPages(orderData.meta.totalPages || 1);
-            setTotalOrders(orderData.meta.total || 0);
-          } else {
-            setOrders(Array.isArray(orderData) ? orderData : []);
-            setTotalPages(1);
-            setTotalOrders(Array.isArray(orderData) ? orderData.length : 0);
-          }
-        } catch (error) {
-          console.error('Error fetching orders:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
       fetchOrders();
     } else {
       setLoading(false);
     }
   }, [user, page]);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) return;
+    
+    try {
+      await api.patch(`/orders/${orderId}/cancel`);
+      showToast('Order cancelled successfully', 'error');
+      fetchOrders(); // Refresh list
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      showToast(error.response?.data?.message || 'Failed to cancel order', 'error');
+    }
+  };
 
   if (!user) {
     return (
@@ -136,6 +152,15 @@ const Orders = () => {
                     {normalizeStatus(order.status) === 'delivered' && <span className="badge badge-success">Delivered</span>}
                     {normalizeStatus(order.status) === 'cancelled' && <span className="badge badge-error">Cancelled</span>}
                   </div>
+                  {normalizeStatus(order.status) === 'pending' && (
+                    <button 
+                      className="btn btn-danger btn-sm" 
+                      onClick={() => handleCancelOrder(order.id)}
+                      style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}
+                    >
+                      Cancel Order
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -24,7 +24,7 @@ const ProductCard = ({ product, isLiked = false, onWishlistChange }) => {
       if (isInWishlist) {
         await api.delete(`/wishlist/${product.id}`);
         setIsInWishlist(false);
-        showToast('Removed from wishlist', 'info');
+        showToast('Removed from wishlist', 'error');
         if (onWishlistChange) onWishlistChange(product.id, false);
       } else {
         await api.post('/wishlist', { productId: product.id });
@@ -40,10 +40,18 @@ const ProductCard = ({ product, isLiked = false, onWishlistChange }) => {
   return (
     <div className="card product-card">
       <div className="product-image-container">
-        {/* Mocking an image background matching the theme since we don't have real images in DB */}
-        <div className="product-placeholder-image">
-           {product.name.charAt(0)}
-        </div>
+        <Link to={`/products/${product.id}`} className="product-image-link w-100 h-100">
+          <div className="product-placeholder-image">
+             {product.image ? (
+               <img 
+                 src={product.image} 
+                 alt={product.name} 
+                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                 onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = product.name.charAt(0); }}
+               />
+             ) : product.name.charAt(0)}
+          </div>
+        </Link>
         <button 
           className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
           onClick={toggleWishlist}

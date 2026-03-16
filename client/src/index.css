@@ -25,7 +25,8 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 15px rgba(250, 219, 95, 0.4);
+  --shadow-glow: 0 0 20px rgba(250, 219, 95, 0.5);
+  --shadow-glow-strong: 0 0 30px rgba(250, 219, 95, 0.6);
 
   /* Border Radius */
   --radius-sm: 0.375rem;
@@ -98,6 +99,14 @@ p {
   justify-content: center;
 }
 
+.flex {
+  display: flex;
+}
+
+.gap-4 {
+  gap: 1.5rem;
+}
+
 .flex-column {
   flex-direction: column;
 }
@@ -157,6 +166,11 @@ p {
   transition: all var(--transition-normal);
 }
 
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+}
+
 .btn-primary {
   background-color: var(--accent-yellow);
   color: var(--primary-blue-dark);
@@ -164,8 +178,8 @@ p {
 
 .btn-primary:hover {
   background-color: var(--accent-yellow-light);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow-strong);
 }
 
 .btn-primary:active {
@@ -194,6 +208,19 @@ p {
   color: white;
 }
 
+.btn-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+  background-color: #ef4444;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
 .card {
   background: var(--surface-color);
   border-radius: var(--radius-lg);
@@ -204,8 +231,9 @@ p {
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border-color: var(--accent-yellow-dark);
 }
 
 .badge {
@@ -295,7 +323,7 @@ p {
   padding: 1rem 1.5rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  z-index: 10001;
+  z-index: 99999;
   font-weight: 600;
   min-width: 250px;
   text-align: left;

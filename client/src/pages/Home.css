@@ -100,8 +100,8 @@
 }
 
 .cat-tab-premium:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
   border-color: var(--accent-yellow);
 }
 

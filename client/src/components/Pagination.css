@@ -26,11 +26,11 @@
 }
 
 .pagination-btn:hover:not(:disabled):not(.active) {
-  border-color: var(--primary-blue);
+  border-color: var(--accent-yellow);
   color: var(--primary-blue);
-  background: rgba(59, 130, 246, 0.08);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  background: rgba(250, 219, 95, 0.1);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow);
 }
 
 .pagination-btn.active {

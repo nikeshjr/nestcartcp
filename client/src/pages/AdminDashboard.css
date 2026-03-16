@@ -258,7 +258,13 @@
   border-left: none;
   position: relative;
   overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: all var(--transition-normal);
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  border: 1px solid var(--accent-yellow);
 }
 
 .stat-card::before {

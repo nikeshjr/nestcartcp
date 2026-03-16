@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 const NotificationContext = createContext();
 
@@ -25,12 +26,13 @@ export const NotificationProvider = ({ children }) => {
   return (
     <NotificationContext.Provider value={{ showToast }}>
       {children}
-      {toast && (
+      {toast && createPortal(
         <div className={`toast toast-${toast.type} animate-fade-in`}>
           <div className="toast-content">
             {toast.message}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </NotificationContext.Provider>
   );

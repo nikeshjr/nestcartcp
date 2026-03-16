@@ -54,7 +54,7 @@ const ProductDetail = () => {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!user) {
-      showToast('Please login to leave a review', 'info');
+      showToast('Please login to leave a review', 'warning');
       return;
     }
     

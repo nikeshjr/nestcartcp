@@ -17,6 +17,7 @@ model User {
   orders    Order[]
   cartItems CartItem[]
   wishlist  WishlistItem[]
+  reviews   Review[]
 }
 
 // Products
@@ -27,12 +28,26 @@ model Product {
   price       Float
   stock       Int
   categoryId  Int?
+  image       String?     @db.Text
   createdAt   DateTime    @default(now())
   
   category    Category?   @relation(fields: [categoryId], references: [id])
   orderItems  OrderItem[]
   cartItems   CartItem[]
   wishlistItems WishlistItem[]
+  reviews     Review[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int      // 1-5
+  comment   String   @db.Text
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model Category {

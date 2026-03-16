@@ -39,6 +39,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CategoryModule } from './category/category.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     CategoryModule,
     WishlistModule,
     AnalyticsModule,
+    ReviewModule,
   ],
   controllers: [],
   providers: [

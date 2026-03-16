@@ -25,4 +25,9 @@ export class CreateProductDto {
   @IsNumber()
   @IsOptional()
   categoryId?: number;
+
+  @ApiPropertyOptional({ example: 'https://example.com/image.jpg', description: 'Product image URL' })
+  @IsString()
+  @IsOptional()
+  image?: string;
 }

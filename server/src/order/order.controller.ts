@@ -39,6 +39,11 @@ export class OrderController {
     return this.orderService.findOne(+id, req.user.userId, req.user.role);
   }
 
+  @Patch(':id/cancel')
+  cancel(@Param('id') id: string, @Request() req) {
+    return this.orderService.cancel(+id, req.user.userId);
+  }
+
   @Patch(':id')
   @Roles('admin')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {

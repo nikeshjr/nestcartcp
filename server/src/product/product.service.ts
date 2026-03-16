@@ -66,12 +66,22 @@ export class ProductService {
     
     // Use a transaction to ensure atomic deletion of relations
     return this.prisma.$transaction(async (tx) => {
-      // First, remove from all shopping carts
+      // 1. Remove from all shopping carts
       await tx.cartItem.deleteMany({
         where: { productId: id }
       });
       
-      // Second, remove from order history (needed for hard-delete)
+      // 2. Remove from wishlist
+      await tx.wishlistItem.deleteMany({
+        where: { productId: id }
+      });
+      
+      // 3. Remove reviews
+      await tx.review.deleteMany({
+        where: { productId: id }
+      });
+      
+      // 4. Remove from order history (needed for hard-delete)
       await tx.orderItem.deleteMany({
         where: { productId: id }
       });

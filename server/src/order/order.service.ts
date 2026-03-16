@@ -129,6 +129,43 @@ export class OrderService {
     return order;
   }
 
+  async cancel(id: number, userId: number) {
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: { items: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (order.userId !== userId) {
+      throw new BadRequestException('You can only cancel your own orders');
+    }
+
+    if (order.status !== 'pending') {
+      throw new BadRequestException(`Cannot cancel order in ${order.status} state`);
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // Update order status
+      const updatedOrder = await tx.order.update({
+        where: { id },
+        data: { status: 'cancelled' },
+      });
+
+      // Restore stock
+      for (const item of order.items) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+
+      return updatedOrder;
+    });
+  }
+
   async updateStatus(id: number, updateOrderDto: UpdateOrderDto) {
     const order = await this.prisma.order.findUnique({ where: { id } });
     if (!order) {

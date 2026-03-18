@@ -163,11 +163,42 @@
 }
 
 .star-btn {
-  transition: transform var(--transition-fast);
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.star-btn:hover {
+.star-btn:hover,
+.star-btn.hovered,
+.star-btn.selected {
   transform: scale(1.2);
+}
+
+.star-btn svg {
+  transition: all var(--transition-short);
+}
+
+/* Hover State - Stronger Glow */
+.star-btn.hovered svg {
+  filter: drop-shadow(0 0 12px rgba(255, 193, 7, 0.8));
+  opacity: 1;
+}
+
+/* Selected State - Solid and steady */
+.star-btn.selected svg {
+  filter: drop-shadow(0 0 5px rgba(255, 193, 7, 0.4));
+  opacity: 1;
+}
+
+/* Override for stars that are BOTH hovered and selected */
+.star-btn.selected.hovered svg {
+  filter: drop-shadow(0 0 15px rgba(255, 193, 7, 1));
+  transform: scale(1.1);
 }
 
 .review-form-card {

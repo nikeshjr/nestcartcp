@@ -171,10 +171,57 @@ export class OrderService {
     if (!order) {
       throw new NotFoundException('Order not found');
     }
-    
+
+    const currentStatus = order.status;
+    const nextStatus = updateOrderDto.status;
+
+    // Define valid transitions
+    const transitions: Record<string, string[]> = {
+      pending: ['processing', 'cancelled'],
+      processing: ['shipped', 'cancelled'],
+      shipped: ['delivered', 'cancelled'],
+      delivered: [], // Terminal state
+      cancelled: [],   // Terminal state
+    };
+
+    if (currentStatus === nextStatus) {
+      return order; // No change needed
+    }
+
+    const allowed = transitions[currentStatus] || [];
+    if (!allowed.includes(nextStatus)) {
+      throw new BadRequestException('Invalid order status transition');
+    }
+
+    // Special logic for cancellation: Restore stock if moving to 'cancelled'
+    if (nextStatus === 'cancelled') {
+      return this.prisma.$transaction(async (tx) => {
+        const updatedOrder = await tx.order.update({
+          where: { id },
+          data: { status: 'cancelled' },
+        });
+
+        // Need to fetch items if we are in this specific flow
+        const orderWithItems = await tx.order.findUnique({
+          where: { id },
+          include: { items: true },
+        });
+
+        if (orderWithItems && orderWithItems.items) {
+          for (const item of orderWithItems.items) {
+            await tx.product.update({
+              where: { id: item.productId },
+              data: { stock: { increment: item.quantity } },
+            });
+          }
+        }
+        return updatedOrder;
+      });
+    }
+
     return this.prisma.order.update({
       where: { id },
-      data: { status: updateOrderDto.status },
+      data: { status: nextStatus },
     });
   }
 }

@@ -5,7 +5,7 @@ import { Package, ClipboardList, Plus, Edit, Trash2, CheckCircle, Clock, XCircle
 import api from '../services/api';
 import { useNotification } from '../context/NotificationContext';
 import Pagination from '../components/Pagination';
-import './AdminDashboard.css';
+import '../style/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
@@ -410,12 +410,27 @@ const AdminDashboard = () => {
                           value={order.status}
                           onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                           style={{ width: '130px', marginRight: '1rem' }}
+                          disabled={['delivered', 'cancelled'].includes(order.status)}
                         >
-                          <option value="pending">Pending</option>
-                          <option value="processing">Processing</option>
-                          <option value="shipped">Shipped</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
+                          <option value={order.status} disabled>{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</option>
+                          {order.status === 'pending' && (
+                            <>
+                              <option value="processing">Processing</option>
+                              <option value="cancelled">Cancelled</option>
+                            </>
+                          )}
+                          {order.status === 'processing' && (
+                            <>
+                              <option value="shipped">Shipped</option>
+                              <option value="cancelled">Cancelled</option>
+                            </>
+                          )}
+                          {order.status === 'shipped' && (
+                            <>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </>
+                          )}
                         </select>
                         <button className="action-btn" onClick={() => handleViewOrder(order.id)} title="View Details">
                           <ChevronRight size={18} />

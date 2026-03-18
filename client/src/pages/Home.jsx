@@ -13,7 +13,7 @@ import {
   CheckCircle2 
 } from 'lucide-react';
 import api from '../services/api';
-import './Home.css';
+import '../style/Home.css';
 
 const Home = () => {
   const [products, setProducts] = useState([]);

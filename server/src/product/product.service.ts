@@ -15,7 +15,7 @@ export class ProductService {
   }
 
   async findAll(search?: string, categoryId?: number, page = 1, limit = 12) {
-    const where: any = {};
+    const where: any = { isActive: true }; // Only show active products
     if (search) {
       where.name = { contains: search };
     }
@@ -61,35 +61,28 @@ export class ProductService {
   }
 
   async remove(id: number) {
-    const product = await this.prisma.product.findUnique({ where: { id } });
+    const product = await this.prisma.product.findUnique({ 
+      where: { id },
+      include: { orderItems: true } // check if it was part of orders
+    });
     if (!product) throw new NotFoundException('Product not found');
     
-    // Use a transaction to ensure atomic deletion of relations
-    return this.prisma.$transaction(async (tx) => {
-      // 1. Remove from all shopping carts
-      await tx.cartItem.deleteMany({
-        where: { productId: id }
-      });
-      
-      // 2. Remove from wishlist
-      await tx.wishlistItem.deleteMany({
-        where: { productId: id }
-      });
-      
-      // 3. Remove reviews
-      await tx.review.deleteMany({
-        where: { productId: id }
-      });
-      
-      // 4. Remove from order history (needed for hard-delete)
-      await tx.orderItem.deleteMany({
-        where: { productId: id }
-      });
-      
-      // Finally, delete the product itself
-      return tx.product.delete({
+    // Check if product was ever ordered
+    const hasBeenOrdered = product.orderItems.length > 0;
+
+    if (hasBeenOrdered) {
+      // SOFT DELETE: Keep the record for order history but hide it from store
+      return this.prisma.product.update({
         where: { id },
+        data: { isActive: false }
       });
+    }
+
+    // HARD DELETE: If never ordered, we can safely remove it and its cart items/reviews
+    return this.prisma.$transaction(async (tx) => {
+      await tx.cartItem.deleteMany({ where: { productId: id } });
+      await tx.review.deleteMany({ where: { productId: id } });
+      return tx.product.delete({ where: { id } });
     });
   }
 
@@ -99,10 +92,8 @@ export class ProductService {
     const [products, categories] = await Promise.all([
       this.prisma.product.findMany({
         where: {
-          OR: [
-            { name: { contains: query } },
-            { description: { contains: query } },
-          ],
+          name: { contains: query },
+          isActive: true, // Only suggest active products
         },
         select: { id: true, name: true, price: true, image: true },
         take: 5,

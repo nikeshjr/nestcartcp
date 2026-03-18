@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request, Patch } from '@nestjs/common';
 import { ReviewService } from './review.service';
-import { AuthGuard } from '@nestjs/passport';
-import { Public } from '../auth/public/public.decorator';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { Public } from '../auth/auth.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Reviews')
@@ -10,7 +10,7 @@ export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Request() req,
@@ -25,7 +25,7 @@ export class ReviewController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -53,7 +53,7 @@ export class ReviewController {
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
     const isAdmin = req.user.role === 'admin';

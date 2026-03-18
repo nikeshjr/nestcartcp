@@ -2,9 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, UseGuards, Request, Query } 
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '../auth/auth.guard';
+import { Roles } from '../auth/auth.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 

@@ -34,10 +34,9 @@ import { OrderModule } from './order/order.module';
 import { CartModule } from './cart/cart.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './auth/auth.guard';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CategoryModule } from './category/category.module';
-import { WishlistModule } from './wishlist/wishlist.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ReviewModule } from './review/review.module';
 
@@ -50,7 +49,6 @@ import { ReviewModule } from './review/review.module';
     OrderModule,
     CartModule,
     CategoryModule,
-    WishlistModule,
     AnalyticsModule,
     ReviewModule,
   ],

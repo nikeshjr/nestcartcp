@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trash2, ShoppingBag, CheckCircle, AlertCircle } from 'lucide-react';
-import './Cart.css';
+import '../style/Cart.css';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';

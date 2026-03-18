@@ -1,9 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
-import { Public } from '../auth/public/public.decorator';
+import { JwtAuthGuard, RolesGuard } from '../auth/auth.guard';
+import { Roles, Public } from '../auth/auth.decorator';
 
 @Controller('categories')
 export class CategoryController {

@@ -1,8 +1,7 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '../auth/auth.guard';
+import { Roles } from '../auth/auth.decorator';
 
 @Controller('analytics')
 @UseGuards(JwtAuthGuard, RolesGuard)

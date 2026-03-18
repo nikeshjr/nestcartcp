@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { useNavigate, Link } from 'react-router-dom';
-import './Auth.css';
+import '../style/Auth.css';
 
 const Register = () => {
   const [username, setUsername] = useState('');

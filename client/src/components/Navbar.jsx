@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, PackageSearch, History, Menu, X, User, LogOut, ShieldCheck, Heart, Search, Tag } from 'lucide-react';
+import { ShoppingCart, PackageSearch, History, Menu, X, User, LogOut, ShieldCheck, Search, Tag } from 'lucide-react';
 import api from '../services/api';
-import './Navbar.css';
+import '../style/Navbar.css';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -194,11 +194,6 @@ const Navbar = () => {
               </Link>
             )}
 
-            {user && (
-              <Link to="/wishlist" className={`nav-link ${isActive('/wishlist')}`} title="Wishlist">
-                <Heart size={18} />
-              </Link>
-            )}
             
             <Link to="/cart" className={`nav-cart ${isActive('/cart')}`}>
               <ShoppingCart size={20} />
@@ -243,11 +238,6 @@ const Navbar = () => {
           <Link to="/" className={`mobile-nav-link ${isActive('/')}`} onClick={toggleMenu}>
             Products
           </Link>
-          {user && (
-            <Link to="/wishlist" className={`mobile-nav-link ${isActive('/wishlist')}`} onClick={toggleMenu}>
-              Favorites
-            </Link>
-          )}
           <Link to="/cart" className={`mobile-nav-link ${isActive('/cart')}`} onClick={toggleMenu}>
             Cart ({itemCount})
           </Link>

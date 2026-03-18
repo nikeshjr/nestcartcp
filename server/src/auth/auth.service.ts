@@ -28,10 +28,9 @@ export class AuthService {
 
   async login(username: string, password: string) {
     const user = await this.prisma.user.findUnique({ where: { username } });
-    if (!user) {
+    if (!user){
       throw new UnauthorizedException('Account not registered');
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new UnauthorizedException('Invalid credentials');
 

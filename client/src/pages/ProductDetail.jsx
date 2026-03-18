@@ -5,7 +5,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotification } from '../context/NotificationContext';
-import './ProductDetail.css';
+import '../style/ProductDetail.css';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -19,13 +19,15 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   
   // Review form state
-  const [newRating, setNewRating] = useState(5);
+  const [newRating, setNewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   // Edit review state
   const [editingId, setEditingId] = useState(null);
-  const [editRating, setEditRating] = useState(5);
+  const [editRating, setEditRating] = useState(0);
+  const [editHoverRating, setEditHoverRating] = useState(0);
   const [editComment, setEditComment] = useState('');
 
   useEffect(() => {
@@ -57,6 +59,11 @@ const ProductDetail = () => {
       showToast('Please login to leave a review', 'warning');
       return;
     }
+
+    if (newRating === 0) {
+      showToast('Please select a star rating', 'warning');
+      return;
+    }
     
     setSubmitting(true);
     try {
@@ -72,7 +79,8 @@ const ProductDetail = () => {
       setRatingStats(ratingRes.data);
       
       setNewComment('');
-      setNewRating(5);
+      setNewRating(0);
+      setHoverRating(0);
       showToast('Review submitted successfully!', 'success');
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -108,6 +116,11 @@ const ProductDetail = () => {
 
   const handleUpdateReview = async (e) => {
     e.preventDefault();
+    if (editRating === 0) {
+      showToast('Please select a star rating', 'warning');
+      return;
+    }
+
     setSubmitting(true);
     try {
       const response = await api.patch(`/reviews/${editingId}`, {
@@ -122,6 +135,7 @@ const ProductDetail = () => {
       setRatingStats(ratingRes.data);
       
       setEditingId(null);
+      setEditHoverRating(0);
       showToast('Review updated', 'warning');
     } catch (error) {
       console.error('Error updating review:', error);
@@ -213,20 +227,27 @@ const ProductDetail = () => {
                         <div className="form-group">
                           <label className="form-label">Edit Rating</label>
                           <div className="star-select">
-                            {[1, 2, 3, 4, 5].map(star => (
-                              <button 
-                                key={star}
-                                type="button"
-                                onClick={() => setEditRating(star)}
-                                className="star-btn"
-                              >
-                                <Star 
-                                  size={20} 
-                                  fill={star <= editRating ? 'var(--accent-yellow)' : 'none'}
-                                  className={star <= editRating ? 'star-filled' : 'star-empty'}
-                                />
-                              </button>
-                            ))}
+                            {[1, 2, 3, 4, 5].map(star => {
+                              const isHovered = editHoverRating >= star;
+                              const isSelected = editRating >= star;
+                              return (
+                                <button 
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setEditRating(star)}
+                                  onMouseEnter={() => setEditHoverRating(star)}
+                                  onMouseLeave={() => setEditHoverRating(0)}
+                                  className={`star-btn ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
+                                >
+                                  <Star 
+                                    size={20} 
+                                    fill={(isSelected || isHovered) ? 'var(--accent-yellow)' : 'none'}
+                                    color={(isSelected || isHovered) ? 'var(--accent-yellow)' : 'var(--border-color)'}
+                                    strokeWidth={isHovered ? 3 : 2}
+                                  />
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                         <div className="form-group">
@@ -290,20 +311,27 @@ const ProductDetail = () => {
                 <div className="form-group">
                   <label className="form-label">Rating</label>
                   <div className="star-select">
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <button 
-                        key={star}
-                        type="button"
-                        onClick={() => setNewRating(star)}
-                        className="star-btn"
-                      >
-                        <Star 
-                          size={24} 
-                          fill={star <= newRating ? 'var(--accent-yellow)' : 'none'}
-                          className={star <= newRating ? 'star-filled' : 'star-empty'}
-                        />
-                      </button>
-                    ))}
+                    {[1, 2, 3, 4, 5].map(star => {
+                      const isHovered = hoverRating >= star;
+                      const isSelected = newRating >= star;
+                      return (
+                        <button 
+                          key={star}
+                          type="button"
+                          onClick={() => setNewRating(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          className={`star-btn ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
+                        >
+                          <Star 
+                            size={24} 
+                            fill={(isSelected || isHovered) ? 'var(--accent-yellow)' : 'none'}
+                            color={(isSelected || isHovered) ? 'var(--accent-yellow)' : 'var(--border-color)'}
+                            strokeWidth={isHovered ? 3 : 2}
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="form-group">

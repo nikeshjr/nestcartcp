@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Delete, Body, Param, Request, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('cart')
 @UseGuards(JwtAuthGuard)

@@ -89,30 +89,3 @@
   gap: 0.3rem;
 }
 
-.wishlist-btn {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  transition: all var(--transition-fast);
-  z-index: 2;
-}
-
-.wishlist-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  transform: scale(1.1);
-}
-
-.wishlist-btn.active {
-  background: white;
-  box-shadow: var(--shadow-md);
-}

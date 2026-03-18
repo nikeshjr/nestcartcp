@@ -9,17 +9,18 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
-@UseGuards(RolesGuard)
 @Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@Request() req, @Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(req.user.userId, createOrderDto);
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll(
     @Request() req,
     @Query('page') page?: string,
@@ -34,16 +35,19 @@ export class OrderController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Request() req, @Param('id') id: string) {
     return this.orderService.findOne(+id, req.user.userId, req.user.role);
   }
 
   @Patch(':id/cancel')
+  @UseGuards(JwtAuthGuard)
   cancel(@Param('id') id: string, @Request() req) {
     return this.orderService.cancel(+id, req.user.userId);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.orderService.updateStatus(+id, updateOrderDto);

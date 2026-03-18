@@ -4,11 +4,11 @@ import { JwtAuthGuard, RolesGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/auth.decorator';
 
 @Controller('analytics')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   getStats() {
     return this.analyticsService.getDashboardStats();

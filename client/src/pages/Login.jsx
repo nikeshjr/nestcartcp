@@ -6,7 +6,7 @@ import '../style/Auth.css';
 const Login = () => {
   const location = useLocation();
   const redirectMessage = location.state?.message;
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const { login } = useAuth();
@@ -16,7 +16,7 @@ const Login = () => {
     e.preventDefault();
     setError(null);
     try {
-      await login(username, password);
+      await login(identifier, password);
       navigate('/'); // Redirect to home after login
     } catch (err) {
       setError(err.message);
@@ -35,13 +35,14 @@ const Login = () => {
           {redirectMessage && <div className="alert alert-info mb-4">{redirectMessage}</div>}
           {error && <div className="alert alert-error mb-4">{error}</div>}
           <div className="form-group">
-            <label className="form-label" htmlFor="username">Username</label>
+            <label className="form-label" htmlFor="identifier">Username or Email</label>
             <input 
               type="text" 
-              id="username" 
+              id="identifier" 
               className="form-input" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username or email"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required 
             />
           </div>

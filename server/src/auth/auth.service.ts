@@ -27,7 +27,15 @@ export class AuthService {
   }
 
   async login(username: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { username } });
+    // Allows login with either username or email
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          { username },
+          { email: username }
+        ]
+      }
+    });
     if (!user){
       throw new UnauthorizedException('Account not registered');
     }

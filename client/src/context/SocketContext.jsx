@@ -14,6 +14,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const socketUrl = 'https://nestcartcp.onrender.com';
+    // const socketUrl = 'http://localhost:8081';
     const newSocket = io(socketUrl, {
       transports: ['websocket'],
     });

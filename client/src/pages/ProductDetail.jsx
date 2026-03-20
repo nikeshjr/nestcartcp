@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, ShoppingCart, ArrowLeft, MessageSquare, User, Edit2, Trash2 } from 'lucide-react';
+import { Star, ShoppingCart, ArrowLeft, MessageSquare, User, Edit2, Trash2, Eye, AlertTriangle } from 'lucide-react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -19,6 +19,7 @@ const ProductDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [ratingStats, setRatingStats] = useState({ averageRating: 0, count: 0 });
   const [loading, setLoading] = useState(true);
+  const [viewerCount, setViewerCount] = useState(1);
   
   // Review form state
   const [newRating, setNewRating] = useState(0);
@@ -64,10 +65,22 @@ const ProductDetail = () => {
       }
     };
 
+    const handleViewersUpdate = (data) => {
+      if (parseInt(data.productId) === parseInt(id)) {
+        setViewerCount(data.viewerCount);
+      }
+    };
+
     socket.on('stockUpdated', handleStockUpdate);
+    socket.on('productViewersUpdated', handleViewersUpdate);
+    
+    // Tell server we are viewing this product
+    socket.emit('viewProduct', parseInt(id));
 
     return () => {
       socket.off('stockUpdated', handleStockUpdate);
+      socket.off('productViewersUpdated', handleViewersUpdate);
+      socket.emit('stopViewingProduct', parseInt(id));
     };
   }, [socket, id]);
 
@@ -209,6 +222,22 @@ const ProductDetail = () => {
             <span className="rating-text">({ratingStats.count} reviews)</span>
           </div>
           <p className="product-price-lg mb-6">${product.price.toFixed(2)}</p>
+          
+          <div className="fomo-container">
+            <div className="viewer-badge">
+              <div className="live-dot"></div>
+              <Eye size={16} />
+              <span>{viewerCount} {viewerCount === 1 ? 'person is' : 'people are'} looking at this</span>
+            </div>
+            
+            {product.stock > 0 && product.stock <= 5 && (
+              <div className="demand-alert">
+                <AlertTriangle size={18} />
+                <span>High Demand! Only {product.stock} left in stock.</span>
+              </div>
+            )}
+          </div>
+
           <p className="product-description mb-8">{product.description || "Premium quality product with attention to detail."}</p>
           
           {!isAdmin && (

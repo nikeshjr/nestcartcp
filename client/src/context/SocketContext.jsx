@@ -13,7 +13,7 @@ export const SocketProvider = ({ children }) => {
   const { showToast } = useNotification();
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_API_URL || 'http://localhost:8081';
+    const socketUrl = 'https://nestcartcp.onrender.com';
     const newSocket = io(socketUrl, {
       transports: ['websocket'],
     });

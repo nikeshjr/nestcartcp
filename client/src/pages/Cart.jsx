@@ -11,7 +11,7 @@ const Cart = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState(null);
 
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const handleCheckout = async () => {
@@ -30,6 +30,22 @@ const Cart = () => {
       setIsProcessing(false);
     }
   };
+
+  if (user && isAdmin) {
+    return (
+      <div className="container animate-fade-in flex-center flex-column" style={{ minHeight: '60vh' }}>
+        <div className="card text-center" style={{ padding: '4rem 2rem', maxWidth: '500px' }}>
+          <AlertCircle size={64} className="mb-4" style={{ color: 'var(--accent-yellow)' }} />
+          <h2 className="mb-2">Admin Access Restricted</h2>
+          <p className="mb-8">Administrators are not permitted to add items to the cart or place orders. Please use the Admin Dashboard for management tasks.</p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <Link to="/admin" className="btn btn-primary">Go to Dashboard</Link>
+            <Link to="/" className="btn btn-secondary">Browse Products</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

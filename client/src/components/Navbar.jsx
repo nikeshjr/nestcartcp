@@ -195,10 +195,12 @@ const Navbar = () => {
             )}
 
             
-            <Link to="/cart" className={`nav-cart ${isActive('/cart')}`}>
-              <ShoppingCart size={20} />
-              {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
-            </Link>
+            {!isAdmin && (
+              <Link to="/cart" className={`nav-cart ${isActive('/cart')}`}>
+                <ShoppingCart size={20} />
+                {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
+              </Link>
+            )}
 
             {user ? (
                 <div className="user-profile-menu flex-center" style={{ gap: '1rem', marginLeft: '1rem' }}>
@@ -238,9 +240,11 @@ const Navbar = () => {
           <Link to="/" className={`mobile-nav-link ${isActive('/')}`} onClick={toggleMenu}>
             Products
           </Link>
-          <Link to="/cart" className={`mobile-nav-link ${isActive('/cart')}`} onClick={toggleMenu}>
-            Cart ({itemCount})
-          </Link>
+          {!isAdmin && (
+            <Link to="/cart" className={`mobile-nav-link ${isActive('/cart')}`} onClick={toggleMenu}>
+              Cart ({itemCount})
+            </Link>
+          )}
         </div>
       )}
     </nav>

@@ -14,7 +14,8 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('user')
   create(@Request() req, @Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(req.user.userId, createOrderDto);
   }

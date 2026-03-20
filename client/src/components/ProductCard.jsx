@@ -9,7 +9,7 @@ import { useNotification } from '../context/NotificationContext';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { showToast } = useNotification();
   
   return (
@@ -38,13 +38,15 @@ const ProductCard = ({ product }) => {
         
         <div className="product-footer">
           <span className="product-price">${product.price.toFixed(2)}</span>
-          <button 
-            className="btn btn-primary btn-sm add-cart-btn"
-            onClick={() => addToCart(product)}
-          >
-            <ShoppingCart size={18} />
-             Add
-          </button>
+          {!isAdmin && (
+            <button 
+              className="btn btn-primary btn-sm add-cart-btn"
+              onClick={() => addToCart(product)}
+            >
+              <ShoppingCart size={18} />
+               Add
+            </button>
+          )}
         </div>
       </div>
     </div>

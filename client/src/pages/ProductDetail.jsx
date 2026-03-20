@@ -9,7 +9,7 @@ import '../style/ProductDetail.css';
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { addToCart } = useCart();
   const { showToast } = useNotification();
   
@@ -193,21 +193,34 @@ const ProductDetail = () => {
           <p className="product-price-lg mb-6">${product.price.toFixed(2)}</p>
           <p className="product-description mb-8">{product.description || "Premium quality product with attention to detail."}</p>
           
-          <div className="product-actions">
-            <button 
-              className="btn btn-primary btn-lg glow-hover w-100 mb-4"
-              onClick={() => addToCart(product)}
-            >
-              <ShoppingCart size={20} /> Add to Cart
-            </button>
-            <div className="product-stock-info">
-              {product.stock > 0 ? (
-                <span className="text-success">In Stock ({product.stock} available)</span>
-              ) : (
-                <span className="text-error">Out of Stock</span>
-              )}
+          {!isAdmin && (
+            <div className="product-actions">
+              <button 
+                className="btn btn-primary btn-lg glow-hover w-100 mb-4"
+                onClick={() => addToCart(product)}
+              >
+                <ShoppingCart size={20} /> Add to Cart
+              </button>
+              <div className="product-stock-info">
+                {product.stock > 0 ? (
+                  <span className="text-success">In Stock ({product.stock} available)</span>
+                ) : (
+                  <span className="text-error">Out of Stock</span>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+          {isAdmin && (
+            <div className="product-actions">
+              <div className="product-stock-info">
+                {product.stock > 0 ? (
+                  <span className="text-success">In Stock ({product.stock} available)</span>
+                ) : (
+                  <span className="text-error">Out of Stock</span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

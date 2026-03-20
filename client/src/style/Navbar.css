@@ -1,9 +1,11 @@
 .navbar {
   background-color: var(--primary-blue);
   color: white;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
   box-shadow: var(--shadow-md);
 }
 

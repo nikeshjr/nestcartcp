@@ -30,7 +30,7 @@
 }
 
 .tab-btn.active {
-  background: white;
+  background: var(--surface-card);
   color: var(--primary-blue);
   box-shadow: var(--shadow-sm);
 }
@@ -149,12 +149,12 @@
 
 .badge-success {
   background: rgba(16, 185, 129, 0.1);
-  color: #065F46;
+  color: #10B981;
 }
 
 .badge-error {
   background: rgba(239, 68, 68, 0.1);
-  color: #991B1B;
+  color: #EF4444;
 }
 
 .gap-1 {
@@ -188,7 +188,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.4rem 0.5rem 0.4rem 0.8rem;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  background: var(--surface-hover);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
   font-size: 0.85rem;
@@ -343,7 +343,7 @@
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(248, 250, 252, 0.5);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .analytics-list-title {
@@ -402,7 +402,7 @@
 
 .trending-bar-track {
   height: 6px;
-  background: #f1f5f9;
+  background: var(--border-color);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -450,7 +450,7 @@
 
 .stock-gauge-track {
   height: 6px;
-  background: #f1f5f9;
+  background: var(--border-color);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -526,7 +526,7 @@
 .modal-content {
   width: 100%;
   max-width: 500px;
-  background: white;
+  background: var(--surface-card);
   padding: 2.5rem;
   border-radius: var(--radius-lg);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);

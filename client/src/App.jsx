@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { SocketProvider } from './context/SocketContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Lazy-loaded pages for code splitting
 const Home = React.lazy(() => import('./pages/Home'));
@@ -23,8 +24,9 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <NotificationProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <NotificationProvider>
         <SocketProvider>
           <CartProvider>
           <Router>
@@ -55,8 +57,9 @@ function App() {
             </Router>
         </CartProvider>
         </SocketProvider>
-      </AuthProvider>
-    </NotificationProvider>
+      </NotificationProvider>
+    </ThemeProvider>
+    </AuthProvider>
   );
 }
 

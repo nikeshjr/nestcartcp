@@ -182,9 +182,9 @@ const ProductDetail = () => {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star 
             key={star} 
-            size={18} 
-            className={star <= rating ? 'star-filled' : 'star-empty'} 
-            fill={star <= rating ? 'var(--accent-yellow)' : 'none'}
+            size={28} 
+            fill={star <= rating ? '#FADB5F' : 'none'} 
+            className={star <= rating ? 'star-filled' : 'star-empty'}
           />
         ))}
       </div>

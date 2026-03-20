@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, PackageSearch, History, Menu, X, User, LogOut, ShieldCheck, Search, Tag } from 'lucide-react';
+import { ShoppingCart, PackageSearch, History, Menu, X, User, LogOut, ShieldCheck, Search, Tag, Sun, Moon } from 'lucide-react';
 import api from '../services/api';
 import '../style/Navbar.css';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -12,6 +13,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { itemCount } = useCart();
   const { user, logout, isAdmin } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [suggestions, setSuggestions] = React.useState({ products: [], categories: [] });
   const [showSuggestions, setShowSuggestions] = React.useState(false);
@@ -189,7 +191,7 @@ const Navbar = () => {
             )}
             
             {isAdmin && (
-              <Link to="/admin" className={`nav-link ${isActive('/admin')}`} style={{ color: 'var(--accent-yellow)' }}>
+              <Link to="/admin" className={`nav-link nav-admin-link ${isActive('/admin')}`}>
                 <ShieldCheck size={18} /> Admin Dashboard
               </Link>
             )}
@@ -201,6 +203,15 @@ const Navbar = () => {
                 {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
               </Link>
             )}
+
+            <button 
+              onClick={toggleTheme} 
+              className="theme-toggle" 
+              aria-label="Toggle theme"
+              title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
 
             {user ? (
                 <div className="user-profile-menu flex-center" style={{ gap: '1rem', marginLeft: '1rem' }}>
@@ -245,6 +256,9 @@ const Navbar = () => {
               Cart ({itemCount})
             </Link>
           )}
+          <button onClick={() => { toggleTheme(); toggleMenu(); }} className="mobile-nav-link theme-toggle-mobile">
+            {isDarkMode ? <><Sun size={20} /> Light Mode</> : <><Moon size={20} /> Dark Mode</>}
+          </button>
         </div>
       )}
     </nav>

@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../context/AuthContext';
 import { Package, ClipboardList, Plus, Edit, Trash2, CheckCircle, Clock, XCircle, ChevronRight, BarChart, TrendingUp, Tag, X } from 'lucide-react';
 import api from '../services/api';
 import { useNotification } from '../context/NotificationContext';
+import { useSocket } from '../context/SocketContext';
 import Pagination from '../components/Pagination';
 import '../style/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { isAdmin } = useAuth();
   const { showToast } = useNotification();
+  const socket = useSocket();
   const [activeTab, setActiveTab] = useState('products'); // 'products', 'orders', or 'analytics'
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -36,13 +38,7 @@ const AdminDashboard = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [showCategoryManager, setShowCategoryManager] = useState(false);
 
-  useEffect(() => {
-    if (isAdmin) {
-      loadData();
-    }
-  }, [isAdmin, activeTab, productPage, orderPage]);
-
-  const loadData = async (silent = false) => {
+  const loadData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
       if (activeTab === 'products') {
@@ -85,7 +81,54 @@ const AdminDashboard = () => {
     } finally {
       if (!silent) setLoading(false);
     }
-  };
+  }, [activeTab, productPage, orderPage]);
+
+  useEffect(() => {
+    if (isAdmin) {
+      loadData();
+    }
+  }, [isAdmin, loadData]); // Simplified dependencies
+
+  useEffect(() => {
+    if (!socket || !isAdmin) return;
+
+    const handleNewOrder = (order) => {
+      if (activeTab === 'orders' && orderPage === 1) {
+        setOrders(prev => [order, ...prev.slice(0, 9)]);
+        setOrderTotal(prev => prev + 1);
+      } else if (activeTab === 'analytics') {
+        loadData(true);
+      }
+    };
+
+    const handleOrderUpdate = (updatedOrder) => {
+      console.log('AdminDashboard.jsx: Received adminOrderUpdated:', updatedOrder);
+      if (activeTab === 'orders') {
+        setOrders(prev => prev.map(o => Number(o.id) === Number(updatedOrder.id) ? updatedOrder : o));
+      } else if (activeTab === 'analytics') {
+        loadData(true);
+      }
+    };
+
+    const handleStockUpdate = (data) => {
+      console.log('AdminDashboard.jsx: Received stockUpdated:', data);
+      if (activeTab === 'products') {
+        setProducts(prev => prev.map(p => Number(p.id) === Number(data.productId) ? { ...p, stock: data.newStock } : p));
+      } else if (activeTab === 'analytics') {
+        loadData(true);
+      }
+    };
+
+    socket.on('newOrder', handleNewOrder);
+    socket.on('adminOrderUpdated', handleOrderUpdate);
+    socket.on('stockUpdated', handleStockUpdate);
+
+    return () => {
+      socket.off('newOrder', handleNewOrder);
+      socket.off('adminOrderUpdated', handleOrderUpdate);
+      socket.off('stockUpdated', handleStockUpdate);
+    };
+  }, [socket, isAdmin, activeTab, orderPage, loadData]);
 
   if (!isAdmin) {
     return (

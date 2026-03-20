@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Package, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import { useSocket } from '../context/SocketContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
@@ -35,6 +36,7 @@ const getProgress = (orderStatus) => {
 const Orders = () => {
   const { user } = useAuth();
   const { showToast } = useNotification();
+  const socket = useSocket();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -70,6 +72,27 @@ const Orders = () => {
       setLoading(false);
     }
   }, [user, page]);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const handleOrderStatusUpdate = (data) => {
+      console.log('Orders.jsx: Received orderStatusUpdated:', data);
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          Number(order.id) === Number(data.orderId) 
+            ? { ...order, status: data.status } 
+            : order
+        )
+      );
+    };
+
+    socket.on('orderStatusUpdated', handleOrderStatusUpdate);
+
+    return () => {
+      socket.off('orderStatusUpdated', handleOrderStatusUpdate);
+    };
+  }, [socket, user]);
 
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm('Are you sure you want to cancel this order?')) return;

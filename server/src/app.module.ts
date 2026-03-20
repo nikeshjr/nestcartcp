@@ -39,6 +39,7 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CategoryModule } from './category/category.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ReviewModule } from './review/review.module';
+import { SocketModule } from './common/gateways/socket.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ReviewModule } from './review/review.module';
     CategoryModule,
     AnalyticsModule,
     ReviewModule,
+    SocketModule,
   ],
   controllers: [],
   providers: [

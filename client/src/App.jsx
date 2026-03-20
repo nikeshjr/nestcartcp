@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { SocketProvider } from './context/SocketContext';
 
 // Lazy-loaded pages for code splitting
 const Home = React.lazy(() => import('./pages/Home'));
@@ -24,7 +25,8 @@ function App() {
   return (
     <NotificationProvider>
       <AuthProvider>
-        <CartProvider>
+        <SocketProvider>
+          <CartProvider>
           <Router>
               <div className="app-wrapper">
                 <Navbar />
@@ -52,6 +54,7 @@ function App() {
               </div>
             </Router>
         </CartProvider>
+        </SocketProvider>
       </AuthProvider>
     </NotificationProvider>
   );

@@ -2,10 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { SocketGateway } from '../common/gateways/socket.gateway';
 
 @Injectable()
 export class ProductService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private socketGateway: SocketGateway
+  ) {}
 
   async create(createProductDto: CreateProductDto) {
     return this.prisma.product.create({
@@ -54,10 +58,20 @@ export class ProductService {
     const product = await this.prisma.product.findUnique({ where: { id } });
     if (!product) throw new NotFoundException('Product not found');
     
-    return this.prisma.product.update({
+    const updatedProduct = await this.prisma.product.update({
       where: { id },
       data: updateProductDto,
     });
+
+    // Broadcast stock update if stock was changed
+    if (updateProductDto.stock !== undefined) {
+      this.socketGateway.broadcast('stockUpdated', {
+        productId: id,
+        newStock: updatedProduct.stock
+      });
+    }
+
+    return updatedProduct;
   }
 
   async remove(id: number) {

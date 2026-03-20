@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { SocketGateway } from '../common/gateways/socket.gateway';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private socketGateway: SocketGateway
+  ) {}
 
   async create(userId: number, createOrderDto: CreateOrderDto) {
     let total = 0;
@@ -43,16 +47,31 @@ export class OrderService {
             create: orderItemsData,
           },
         },
-        include: { items: true },
+        include: { 
+          items: { include: { product: true } },
+          user: { select: { username: true } }
+        },
       });
 
-      // Update stock
+      // Update stock and emit events
       for (const item of orderItemsData) {
         await tx.product.update({
           where: { id: item.productId },
           data: { stock: { decrement: item.quantity } },
         });
+        
+        // Broadcast stock update
+        const updatedProduct = await tx.product.findUnique({ where: { id: item.productId } });
+        if (updatedProduct) {
+          this.socketGateway.broadcast('stockUpdated', {
+            productId: item.productId,
+            newStock: updatedProduct.stock
+          });
+        }
       }
+
+      // Notify admins of new order
+      this.socketGateway.broadcast('newOrder', order);
 
       return order;
     });
@@ -147,11 +166,12 @@ export class OrderService {
       throw new BadRequestException(`Cannot cancel order in ${order.status} state`);
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const updatedOrder = await this.prisma.$transaction(async (tx) => {
       // Update order status
-      const updatedOrder = await tx.order.update({
+      const res = await tx.order.update({
         where: { id },
         data: { status: 'cancelled' },
+        include: { items: true, user: { select: { username: true } } }
       });
 
       // Restore stock
@@ -160,10 +180,31 @@ export class OrderService {
           where: { id: item.productId },
           data: { stock: { increment: item.quantity } },
         });
+
+        // Broadcast stock restoration
+        const restoredProduct = await tx.product.findUnique({ where: { id: item.productId } });
+        if (restoredProduct) {
+          this.socketGateway.broadcast('stockUpdated', {
+            productId: item.productId,
+            newStock: restoredProduct.stock
+          });
+        }
       }
 
-      return updatedOrder;
+      return res;
     });
+
+    // Notify user (themselves, but good for consistency)
+    this.socketGateway.sendToUser(updatedOrder.userId, 'orderStatusUpdated', {
+      orderId: updatedOrder.id,
+      status: 'cancelled',
+      message: `Order #${updatedOrder.id} has been cancelled`
+    });
+
+    // Notify admins of the cancellation
+    this.socketGateway.broadcast('adminOrderUpdated', updatedOrder);
+
+    return updatedOrder;
   }
 
   async updateStatus(id: number, updateOrderDto: UpdateOrderDto) {
@@ -193,35 +234,55 @@ export class OrderService {
       throw new BadRequestException('Invalid order status transition');
     }
 
+    let updatedOrder;
+
     // Special logic for cancellation: Restore stock if moving to 'cancelled'
     if (nextStatus === 'cancelled') {
-      return this.prisma.$transaction(async (tx) => {
-        const updatedOrder = await tx.order.update({
+      updatedOrder = await this.prisma.$transaction(async (tx) => {
+        const orderRes = await tx.order.update({
           where: { id },
           data: { status: 'cancelled' },
+          include: { items: true, user: { select: { username: true } } }
         });
 
-        // Need to fetch items if we are in this specific flow
-        const orderWithItems = await tx.order.findUnique({
-          where: { id },
-          include: { items: true },
-        });
-
-        if (orderWithItems && orderWithItems.items) {
-          for (const item of orderWithItems.items) {
+        // Restore stock
+        if (orderRes.items) {
+          for (const item of orderRes.items) {
             await tx.product.update({
               where: { id: item.productId },
               data: { stock: { increment: item.quantity } },
             });
+            
+            // Broadcast stock restoration
+            const restoredProduct = await tx.product.findUnique({ where: { id: item.productId } });
+            if (restoredProduct) {
+              this.socketGateway.broadcast('stockUpdated', {
+                productId: item.productId,
+                newStock: restoredProduct.stock
+              });
+            }
           }
         }
-        return updatedOrder;
+        return orderRes;
+      });
+    } else {
+      updatedOrder = await this.prisma.order.update({
+        where: { id },
+        data: { status: nextStatus },
+        include: { user: { select: { username: true } } }
       });
     }
 
-    return this.prisma.order.update({
-      where: { id },
-      data: { status: nextStatus },
+    // Notify user of status change
+    this.socketGateway.sendToUser(updatedOrder.userId, 'orderStatusUpdated', {
+      orderId: updatedOrder.id,
+      status: nextStatus,
+      message: `Your order #${updatedOrder.id} is now ${nextStatus}`
     });
+
+    // Notify admins of the update
+    this.socketGateway.broadcast('adminOrderUpdated', updatedOrder);
+
+    return updatedOrder;
   }
 }

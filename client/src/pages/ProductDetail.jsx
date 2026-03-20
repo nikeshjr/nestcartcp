@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useNotification } from '../context/NotificationContext';
+import { useSocket } from '../context/SocketContext';
 import '../style/ProductDetail.css';
 
 const ProductDetail = () => {
@@ -12,6 +13,7 @@ const ProductDetail = () => {
   const { user, isAdmin } = useAuth();
   const { addToCart } = useCart();
   const { showToast } = useNotification();
+  const socket = useSocket();
   
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -52,6 +54,22 @@ const ProductDetail = () => {
 
     fetchProductData();
   }, [id, showToast]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleStockUpdate = (data) => {
+      if (parseInt(data.productId) === parseInt(id)) {
+        setProduct(prev => prev ? { ...prev, stock: data.newStock } : prev);
+      }
+    };
+
+    socket.on('stockUpdated', handleStockUpdate);
+
+    return () => {
+      socket.off('stockUpdated', handleStockUpdate);
+    };
+  }, [socket, id]);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();

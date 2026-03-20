@@ -191,7 +191,25 @@ const ProductDetail = () => {
     );
   };
 
-  if (loading) return <div className="container flex-center py-8"><div className="spinner"></div></div>;
+  if (loading) return (
+    <div className="container animate-fade-in product-detail-page">
+      <div className="skeleton skeleton-text mb-8" style={{ width: '150px', height: '1.5rem' }}></div>
+      <div className="product-main-grid">
+        <div className="product-image-section">
+          <div className="skeleton skeleton-rect" style={{ aspectRatio: '1', height: 'auto' }}></div>
+        </div>
+        <div className="product-details-section">
+          <div className="skeleton skeleton-title" style={{ width: '70%', height: '3rem' }}></div>
+          <div className="skeleton skeleton-text" style={{ width: '40%', height: '1.5rem', marginBottom: '2rem' }}></div>
+          <div className="skeleton skeleton-title" style={{ width: '30%', height: '2.5rem', marginBottom: '2.5rem' }}></div>
+          <div className="skeleton skeleton-text" style={{ count: 4 }}></div>
+          <div className="skeleton skeleton-text"></div>
+          <div className="skeleton skeleton-text" style={{ width: '60%' }}></div>
+          <div className="skeleton skeleton-rect mt-8" style={{ height: '3rem', borderRadius: 'var(--radius-md)' }}></div>
+        </div>
+      </div>
+    </div>
+  );
   if (!product) return <div className="container text-center py-8"><h2>Product not found</h2><Link to="/" className="btn btn-primary mt-4">Go Home</Link></div>;
 
   return (

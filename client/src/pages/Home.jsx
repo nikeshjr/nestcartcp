@@ -10,7 +10,8 @@ import {
   Home as HomeIcon, 
   Trophy, 
   BookOpen, 
-  CheckCircle2 
+  CheckCircle2,
+  Image as ImageIcon
 } from 'lucide-react';
 import api from '../services/api';
 import '../style/Home.css';
@@ -144,10 +145,42 @@ const Home = () => {
         </div>
       </div>
 
+      <style>{`
+        .skeleton-card {
+          background: white;
+          border-radius: var(--radius-lg);
+          padding: 1rem;
+          border: 1px solid var(--border-color);
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        .skeleton-image {
+          width: 100%;
+          aspect-ratio: 1;
+          border-radius: var(--radius-md);
+        }
+        .skeleton-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      `}</style>
+
       {loading ? (
-        <div className="flex-center" style={{ minHeight: '400px' }}>
-          <div className="spinner"></div> {/* We'll add a simple spinner to index.css */}
-          <p style={{ marginLeft: '1rem', color: 'var(--primary-blue)' }}>Loading products...</p>
+        <div className="grid-cols-auto">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton skeleton-image flex-center">
+                <ImageIcon size={48} color="rgba(0,0,0,0.05)" />
+              </div>
+              <div className="skeleton-info">
+                <div className="skeleton skeleton-title" style={{ width: '80%' }}></div>
+                <div className="skeleton skeleton-text" style={{ width: '40%' }}></div>
+                <div className="skeleton skeleton-text" style={{ width: '100%', height: '2.5rem', marginTop: '0.5rem' }}></div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : products.length > 0 ? (
         <>

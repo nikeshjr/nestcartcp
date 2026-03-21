@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Pagination from '../components/Pagination';
-import { 
-  PackageSearch, 
-  LayoutGrid, 
-  Laptop, 
-  Shirt, 
-  Home as HomeIcon, 
-  Trophy, 
-  BookOpen, 
+import {
+  PackageSearch,
+  LayoutGrid,
+  Laptop,
+  Shirt,
+  Home as HomeIcon,
+  Trophy,
+  BookOpen,
   CheckCircle2,
   Image as ImageIcon
 } from 'lucide-react';
@@ -37,7 +37,7 @@ const Home = () => {
     if (lowerName.includes('book')) return <BookOpen size={20} />;
     return <CheckCircle2 size={20} />;
   };
- 
+
   useEffect(() => {
     const loadInitialData = async () => {
       try {
@@ -62,10 +62,10 @@ const Home = () => {
         const params = { page, limit: 12 };
         if (searchQuery) params.search = searchQuery;
         if (categoryId) params.categoryId = categoryId;
-        
+
         const response = await api.get('/products', { params });
         const data = response.data;
-        
+
         if (data && data.meta) {
           setProducts(data.data || []);
           setTotalPages(data.meta.totalPages || 1);
@@ -82,7 +82,7 @@ const Home = () => {
         setLoading(false);
       }
     };
-    
+
     fetchProducts();
   }, [searchQuery, categoryId, page]);
 
@@ -94,8 +94,8 @@ const Home = () => {
             {searchQuery ? `Search results for "${searchQuery}"` : 'Premium Gear for Your Lifestyle'}
           </h1>
           <p>
-            {searchQuery 
-              ? `Found ${totalProducts} products matching your search.` 
+            {searchQuery
+              ? `Found ${totalProducts} products matching your search.`
               : 'Discover our curated selection of high-quality essentials.'}
           </p>
         </div>
@@ -109,10 +109,10 @@ const Home = () => {
           </div>
           <div className="filter-divider"></div>
         </div>
-        
+
         <div className="category-tabs-wrapper">
           <div className="category-tabs-scroll">
-            <button 
+            <button
               className={`cat-tab-premium ${!categoryId ? 'active' : ''}`}
               onClick={() => {
                 const newParams = new URLSearchParams(searchParams);
@@ -123,9 +123,9 @@ const Home = () => {
               <div className="tab-icon"><LayoutGrid size={20} /></div>
               <span className="tab-text">All Products</span>
             </button>
-            
+
             {categories.map(cat => (
-              <button 
+              <button
                 key={cat.id}
                 className={`cat-tab-premium ${categoryId == cat.id ? 'active' : ''}`}
                 onClick={() => {
@@ -200,13 +200,13 @@ const Home = () => {
           <PackageSearch size={48} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
           <h3 style={{ color: 'white' }}>No products found</h3>
           <p style={{ color: 'var(--text-muted)' }}>Try searching for something else or browse all products.</p>
-          <a 
-            href="/" 
-            className="btn btn-outline mt-4" 
-            style={{ 
-              alignSelf: 'center', 
-              color: 'var(--accent-yellow)', 
-              borderColor: 'var(--accent-yellow)' 
+          <a
+            href="/"
+            className="btn btn-outline mt-4"
+            style={{
+              alignSelf: 'center',
+              color: 'var(--accent-yellow)',
+              borderColor: 'var(--accent-yellow)'
             }}
           >
             Clear Search

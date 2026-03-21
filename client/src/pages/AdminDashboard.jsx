@@ -294,9 +294,84 @@ const AdminDashboard = () => {
         </div>
 
         {loading ? (
-          <div className="flex-center" style={{ minHeight: '400px' }}>
-            <div className="spinner"></div>
-          </div>
+          activeTab === 'products' ? (
+            <div className="admin-content animate-fade-in">
+              <div className="skeleton skeleton-text mb-6" style={{ width: '200px', height: '1.5rem' }}></div>
+              <div className="flex-between mb-4">
+                <div className="skeleton skeleton-title" style={{ width: '180px', height: '1.5rem' }}></div>
+                <div className="skeleton" style={{ width: '150px', height: '2.5rem', borderRadius: 'var(--radius-sm)' }}></div>
+              </div>
+              <div className="card" style={{ padding: '0' }}>
+                <div className="skeleton" style={{ width: '100%', height: '50px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}></div>
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} style={{ padding: '1.2rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '2rem' }}>
+                    <div className="skeleton" style={{ width: '40px', height: '40px', borderRadius: '4px' }}></div>
+                    <div style={{ flex: 1 }}>
+                      <div className="skeleton skeleton-title" style={{ width: '60%', height: '1rem' }}></div>
+                      <div className="skeleton skeleton-text mt-2" style={{ width: '40%', height: '0.8rem' }}></div>
+                    </div>
+                    <div className="skeleton" style={{ width: '80px', height: '1rem' }}></div>
+                    <div className="skeleton" style={{ width: '60px', height: '1rem' }}></div>
+                    <div className="skeleton" style={{ width: '100px', height: '2rem', borderRadius: '4px' }}></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : activeTab === 'orders' ? (
+            <div className="admin-content animate-fade-in">
+              <div className="skeleton skeleton-title mb-6" style={{ width: '220px', height: '2rem' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="card" style={{ padding: '1.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                        <div className="skeleton" style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)' }}></div>
+                        <div>
+                          <div className="skeleton skeleton-title" style={{ width: '100px', height: '1.2rem' }}></div>
+                          <div className="skeleton skeleton-text mt-2" style={{ width: '150px' }}></div>
+                        </div>
+                      </div>
+                      <div className="skeleton" style={{ width: '120px', height: '2.5rem', borderRadius: 'var(--radius-sm)' }}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="admin-content animate-fade-in">
+              <div className="skeleton skeleton-title mb-8" style={{ width: '200px', height: '2rem' }}></div>
+              <div className="analytics-grid">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="card stat-card">
+                    <div className="skeleton" style={{ width: '52px', height: '52px', borderRadius: 'var(--radius-md)' }}></div>
+                    <div style={{ flex: 1 }}>
+                      <div className="skeleton skeleton-text" style={{ width: '60%' }}></div>
+                      <div className="skeleton skeleton-title mt-2" style={{ width: '80%', height: '2.4rem' }}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="grid-2 mt-8">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="card">
+                     <div className="skeleton" style={{ width: '100%', height: '60px', borderTopLeftRadius: 'var(--radius-lg)', borderTopRightRadius: 'var(--radius-lg)' }}></div>
+                     <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                       {[...Array(3)].map((_, j) => (
+                         <div key={j} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                           <div className="skeleton" style={{ width: '32px', height: '32px', borderRadius: '4px' }}></div>
+                           <div style={{ flex: 1 }}>
+                             <div className="skeleton skeleton-text" style={{ width: '70%' }}></div>
+                             <div className="skeleton" style={{ width: '100%', height: '6px', borderRadius: '3px', marginTop: '0.5rem' }}></div>
+                           </div>
+                           <div className="skeleton" style={{ width: '50px', height: '1.5rem' }}></div>
+                         </div>
+                       ))}
+                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
         ) : activeTab === 'products' ? (
           <div className="admin-content animate-fade-in" key="products">
             {/* Category Manager */}

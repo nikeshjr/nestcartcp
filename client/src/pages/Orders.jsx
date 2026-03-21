@@ -124,9 +124,37 @@ const Orders = () => {
 
   if (loading) {
     return (
-      <div className="container animate-fade-in flex-center" style={{ minHeight: '60vh' }}>
-        <div className="spinner"></div>
-        <p style={{ marginLeft: '1rem' }}>Loading your orders...</p>
+      <div className="container animate-fade-in">
+        <div className="mb-8">
+          <div className="skeleton skeleton-title" style={{ width: '250px', height: '2.5rem' }}></div>
+          <div className="skeleton skeleton-text" style={{ width: '350px', height: '1.2rem', marginTop: '0.5rem' }}></div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+                <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                  <div className="skeleton" style={{ width: '56px', height: '56px', borderRadius: 'var(--radius-md)' }}></div>
+                  <div>
+                    <div className="skeleton skeleton-title" style={{ width: '120px', height: '1.5rem' }}></div>
+                    <div className="skeleton skeleton-text" style={{ width: '180px', height: '1rem', marginTop: '0.5rem' }}></div>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div className="skeleton border-radius-sm" style={{ width: '80px', height: '1.5rem', marginLeft: 'auto' }}></div>
+                  <div className="skeleton border-radius-sm mt-3" style={{ width: '100px', height: '1.2rem', marginLeft: 'auto' }}></div>
+                </div>
+              </div>
+              <div className="skeleton" style={{ width: '100%', height: '4px', borderRadius: '2px' }}></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div className="skeleton skeleton-text" style={{ width: '150px' }}></div>
+                <div className="skeleton skeleton-text" style={{ width: '100%' }}></div>
+                <div className="skeleton skeleton-text" style={{ width: '90%' }}></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

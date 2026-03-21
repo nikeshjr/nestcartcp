@@ -3,7 +3,7 @@ import { Package, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { useSocket } from '../context/SocketContext';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import api from '../services/api';
 import Pagination from '../components/Pagination';
 
@@ -34,9 +34,13 @@ const getProgress = (orderStatus) => {
 };
 
 const Orders = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { showToast } = useNotification();
   const socket = useSocket();
+
+  if (user && isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

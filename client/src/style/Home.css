@@ -186,7 +186,7 @@
 }
 
 [data-theme='dark'] .home-hero .hero-content h1 {
-  color: #000000;
+  color: #000000 !important;
 }
 
 [data-theme='dark'] .home-hero .hero-content p {

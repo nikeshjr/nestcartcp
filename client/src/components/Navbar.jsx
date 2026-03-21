@@ -184,7 +184,7 @@ const Navbar = () => {
             <Link to="/" className={`nav-link ${isActive('/')}`}>
               Products
             </Link>
-            {user && (
+            {user && !isAdmin && (
               <Link to="/orders" className={`nav-link ${isActive('/orders')}`}>
                 <History size={18} /> Orders
               </Link>

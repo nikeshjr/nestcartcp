@@ -354,6 +354,24 @@
   color: #000000;
 }
 
+[data-theme='dark'] .search-suggestions {
+  background-color: #121212;
+  border-color: #333333;
+}
+
+[data-theme='dark'] .suggestion-group:not(:last-child) {
+  border-bottom-color: #333333;
+}
+
+[data-theme='dark'] .suggestion-label {
+  background-color: #1A1A1A;
+  color: #888888;
+}
+
+[data-theme='dark'] .suggestion-img {
+  background-color: #1A1A1A;
+}
+
 [data-theme='dark'] .suggestion-item:hover {
   background-color: #1E1E1E;
   color: var(--accent-yellow);

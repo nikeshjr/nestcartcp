@@ -168,7 +168,20 @@
 [data-theme='dark'] .star-empty {
   color: #FFFFFF !important;
   stroke: #FFFFFF !important;
-  opacity: 0.4 !important;
+  opacity: 0.8 !important;
+}
+
+[data-theme='dark'] .star-btn svg {
+  color: rgba(255, 255, 255, 0.6) !important;
+  stroke: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-theme='dark'] .star-btn:hover svg,
+[data-theme='dark'] .star-btn.hovered svg,
+[data-theme='dark'] .star-btn.selected svg {
+  color: var(--accent-yellow) !important;
+  stroke: var(--accent-yellow) !important;
+  opacity: 1 !important;
 }
 
 .star-btn:hover svg,

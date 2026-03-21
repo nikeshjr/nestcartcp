@@ -593,3 +593,55 @@
 .animate-scale-in {
   animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+[data-theme='dark'] .admin-tabs {
+  background: #1A1A1A;
+}
+
+[data-theme='dark'] .tab-btn.active {
+  background: #2A2A2A;
+  color: var(--accent-yellow);
+}
+
+[data-theme='dark'] .admin-table th {
+  background: #1A1A1A;
+  color: var(--accent-yellow);
+  border-bottom: 2px solid var(--accent-yellow);
+}
+
+[data-theme='dark'] .stat-card {
+  background: #121212;
+  border: 1px solid #333333;
+}
+
+[data-theme='dark'] .stat-card:hover {
+  border-color: var(--accent-yellow);
+  background: #1A1A1A;
+}
+
+[data-theme='dark'] .stat-value {
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .trending-rank {
+  background: var(--accent-yellow);
+  color: #000000;
+}
+
+[data-theme='dark'] .trending-item,
+[data-theme='dark'] .stock-item {
+  border-bottom-color: #333333;
+}
+
+[data-theme='dark'] .analytics-list-header {
+  background: #1A1A1A;
+  border-bottom-color: #333333;
+}
+
+[data-theme='dark'] .stock-count-critical { background: rgba(239, 68, 68, 0.2); }
+[data-theme='dark'] .stock-count-warning { background: rgba(245, 158, 11, 0.2); }
+[data-theme='dark'] .stock-count-caution { background: rgba(234, 179, 8, 0.2); }
+
+[data-theme='dark'] .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}

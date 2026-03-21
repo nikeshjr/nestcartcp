@@ -163,3 +163,17 @@
   font-size: 1.1rem;
   padding: 1rem;
 }
+
+[data-theme='dark'] .item-total,
+[data-theme='dark'] .total-row {
+  color: var(--accent-yellow);
+}
+
+[data-theme='dark'] .qty-btn:hover {
+  color: #000000;
+}
+
+[data-theme='dark'] .item-image-placeholder {
+  background: #1A1A1A;
+  color: var(--accent-yellow);
+}

@@ -335,15 +335,31 @@
 }
 
 [data-theme='dark'] .navbar {
-  background-color: #1E293B; /* Slate 800 */
-  border-bottom: 1px solid #334155;
+  background-color: #000000;
+  border-bottom: 1px solid #333333;
 }
 
 [data-theme='dark'] .nav-cart {
-  background-color: var(--primary-blue);
-  color: white;
+  background-color: var(--accent-yellow);
+  color: #000000;
 }
 
 [data-theme='dark'] .nav-cart:hover {
-  background-color: var(--primary-blue-light);
+  background-color: var(--accent-yellow-light);
+  box-shadow: var(--shadow-glow-strong);
+}
+
+[data-theme='dark'] .cart-badge {
+  background-color: #FFFFFF;
+  color: #000000;
+}
+
+[data-theme='dark'] .suggestion-item:hover {
+  background-color: #1E1E1E;
+  color: var(--accent-yellow);
+}
+
+[data-theme='dark'] .mobile-menu {
+  background-color: #000000;
+  border-color: #333333;
 }
